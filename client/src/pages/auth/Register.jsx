@@ -10,6 +10,7 @@ export default function Register() {
     const email = useRef()
     const password = useRef()
     const password2 = useRef(undefined)
+    const ethereum_wallet_address = useRef()
 
 
     async function onSubmitForm(event) {
@@ -19,12 +20,14 @@ export default function Register() {
             last_name: last_name.current.value,
             email: email.current.value,
             password: password.current.value,
-            password2: password2.current.value
+            password2: password2.current.value,
+            ethereum_wallet_address: ethereum_wallet_address.current.value
           };
 
         setLoading(true)
 
         try {
+
             const response = await axiosInstance.post('auth/register', JSON.stringify(data))
 
             setLoading(false)
@@ -47,13 +50,16 @@ export default function Register() {
                     <input type="text" placeholder='Last Name' autoComplete='off' className='form-control' id='last_name' ref={last_name} />
                 </div>
                 <div className="mb-3">
-                    <input type="email" placeholder='Email' autoComplete='off' className='form-control' id="email" ref={email} />
+                    <input type="email" placeholder='Email' autoComplete='off' className='form-control' required id="email" ref={email} />
                 </div>
                 <div className="mb-3">
-                    <input type="password" placeholder='Password' autoComplete='off' className='form-control' id="password" ref={password} />
+                    <input type="password" placeholder='Password' autoComplete='off' className='form-control' required id="password" ref={password} />
                 </div>
                 <div className="mb-3">
                     <input type="password" placeholder='Confirm Password' autoComplete='off' className='form-control' id="passwordConfirmation" ref={password2} />
+                </div>
+                <div className="mb-3">
+                    <input type="text" placeholder='Ethereum Wallet Address' autoComplete='off' className='form-control' required id="ethereum_wallet_address" ref={ethereum_wallet_address} />
                 </div>
                 <div className="mb-3">
                     <button disabled={loading} className='btn btn-success' type="submit">Register</button>

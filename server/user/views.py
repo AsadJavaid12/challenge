@@ -4,6 +4,7 @@ from django.middleware import csrf
 from rest_framework import exceptions as rest_exceptions, response, decorators as rest_decorators, permissions as rest_permissions
 from rest_framework_simplejwt import tokens, views as jwt_views, serializers as jwt_serializers, exceptions as jwt_exceptions
 from user import serializers, models
+from web3 import Web3
 
 
 def get_user_tokens(user):
@@ -128,3 +129,21 @@ def user(request):
 
     serializer = serializers.UserSerializer(user)
     return response.Response(serializer.data)
+
+@rest_decorators.api_view(["GET"])
+@rest_decorators.permission_classes([rest_permissions.IsAuthenticated])
+def home(request):
+    user = request.user
+    wallet_address = user.ethereum_wallet_address
+
+    if wallet_address:
+        try:
+            # Convert the address to checksum format
+            checksum_address = Web3.to_checksum_address(wallet_address)
+            w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/0461273cb14c434f8be8828105377ed8'))
+            balance = w3.eth.get_balance(checksum_address)
+            return response.Response({'ether_balance': str(balance)})
+        except ValueError as e:
+            return response.Response({'error': str(e)}, status=400)
+    else:
+        return response.Response({'error': 'Ethereum wallet address is not provided.'}, status=400)
